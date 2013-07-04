@@ -7,23 +7,32 @@ function _extract(urlTemplate){
 }
 
 /** SearchUrlMap */
-function SearchUrlMap(searchMap){
+function SearchUrlMap(searchMap,opts){
 	for(var i in searchMap){
 		this.set(i,searchMap[i])
 	}
+	if(opts.safe)
+		this.safe= true
 }
 SearchUrlMap.prototype.set= function(nsPrefix,urlTemplate){
-	this.searchMap[nsPrefix]= _extract(urlTemplate)
+	var result= this.searchMap[nsPrefix]= _extract(urlTemplate)
+	if(this.safe && urlTemplate == result)
+		throw "Set something aside from a OpenSearch url mapping"
 }
 SearchUrlMap.prototype.get= function(key){
 	var nsPrefix= key.split(":",1)
-	if(nsPrefix.length == key.length)
-		return Map.prototype.get.apply(this,arguments)
+	if(nsPrefix.length == key.length){
+		if(this.safe){
+			throw "Key entirely lacks a namespace prefix"
+		}else{
+			return Map.prototype.get.apply(this,arguments)
+		}
+	}
 	var searchTemplate= this.searchMap[nsPrefix]
 	if(!searchTemplate)
 		throw "No Search template registered for "+nsPrefix
 	if(searchTemplate.size != 3)
-		return searchTemplate
+		return searchTemplate // impossible in unsafe
 	searchTemplate[1]= key
 	return searchTemplate.join("")
 }
