@@ -13,7 +13,7 @@ function SearchUrlMap(searchMap){
 	}
 }
 SearchUrlMap.prototype.set= function(nsPrefix,urlTemplate){
-	this.searchMap[nsPrefix]= urlTemplate
+	this.searchMap[nsPrefix]= _extract(urlTemplate)
 }
 SearchUrlMap.prototype.get= function(key){
 	var nsPrefix= key.split(":",1)
